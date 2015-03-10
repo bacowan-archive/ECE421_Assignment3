@@ -54,38 +54,35 @@ class ParaMergeSort
               )
             }
 
-      else # there is no such j that satisfies the condition. Try looking at it from the other directions
-        k = getMiddle(right,left)
-        if k != nil
-          a  = 1
-          thread_pool <<
-              Thread.new{
-                pMerge(right[0..((right.size-1)/2)],
-                                 left[0..k],
-                                 from,
-                                 from+(right.size-1)/2+k+1
-                )
-              }
-
-          thread_pool <<
-              Thread.new{
-                pMerge(right[((right.size-1)/2+1)..right.size-1],
-                                 left[k+1..left.size-1],
-                                 from+(right.size-1)/2+k+1+1,
-                                 to
-                )
-              }
-        elsif left.size == 0 or right.size == 0 or left[0] > right[0] # they are already sorted, and either right is bigger than left, or vice versa
-          @array[from..from+right.size-1] = right
-          @array[from+right.size..to] = left
-          #lMerged = right
-          #rMerged = left
-        else
-          @array[from..from+left.size-1] = left
-          @array[from+left.size..to] = right
-          #lMerged = left
-          #rMerged = right
-        end
+      elsif left[(left.size-1)/2] < right[0] # there is no such j that satisfies the condition
+        a = 1
+        thread_pool <<
+            Thread.new {
+              @array[from..from+(left.size-1)/2] = left[0..(left.size-1)/2]
+            }
+        thread_pool <<
+            Thread.new {
+              pMerge(left[((left.size-1)/2+1)..left.size-1],
+                     right,
+                     from+(left.size-1)/2+1,
+                     to
+              )
+            }
+      else
+        b = 1
+        thread_pool <<
+            Thread.new {
+              @array[from+(left.size-1)/2+right.size..to] = left[(left.size-1)/2..left.size-1]
+              a = 1
+            }
+        thread_pool <<
+            Thread.new {
+              pMerge(left[0..((left.size-1)/2-1)],
+                     right,
+                     from,
+                     from+(left.size-1)/2-1+right.size
+              )
+            }
       end
       thread_pool.each{|thread| thread.join}
       fromTo = @array[from..to]
