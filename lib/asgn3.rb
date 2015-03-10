@@ -52,8 +52,3 @@ module Sorter
     return finalList
   end
 end
-
-
-things = [1,2,3,7,5]
-include Sorter
-puts unlimited_Sort(things,1000)#{|a,b| b <=> a}
