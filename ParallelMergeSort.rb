@@ -73,11 +73,15 @@ class ParaMergeSort
         thread_pool <<
             Thread.new {
               @array[from+(left.size-1)/2+right.size..to] = left[(left.size-1)/2..left.size-1]
-              a = 1
             }
+        if ((left.size-1)/2-1) == -1
+          leftside = []
+        else
+          leftside = left[0..((left.size-1)/2-1)]
+        end
         thread_pool <<
             Thread.new {
-              pMerge(left[0..((left.size-1)/2-1)],
+              pMerge(leftside,
                      right,
                      from,
                      from+(left.size-1)/2-1+right.size
@@ -93,10 +97,7 @@ class ParaMergeSort
   end
 
   def pMergeSort(low,high)
-    result = Array.new
     thread_pool = Array.new
-    left = []
-    right = []
     if low < high
       mid = ((low + high) / 2 ).floor
 
